@@ -1,0 +1,35 @@
+name: Automated Issue Comment Bot
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  comment:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Comment on wontfix issues
+        if: github.event.label.name == 'wontfix'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: 'After review, we have decided not to address this issue at this time.'
+            })
+
+      - name: Comment on completed issues
+        if: github.event.label.name == 'completed'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: 'This issue has been resolved. Thank you for your contribution!'
+            })
